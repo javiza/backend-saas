@@ -37,3 +37,21 @@ app:
     # Orígenes permitidos separados por coma. En producción poner los
     # dominios reales del frontend (ej: https://app.tudominio.com)
     allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173,http://localhost:3000}
+
+# Tarjeta guardada + cobro recurrente vía Oneclick (Transbank). Las
+# credenciales por defecto son las públicas de INTEGRACIÓN (ambiente de
+# pruebas de Transbank) — en producción hay que sobreescribir TODAS estas
+# variables con las credenciales reales entregadas por Transbank al afiliarse.
+transbank:
+  oneclick:
+    # INTEGRATION (pruebas, no cobra plata real) o PRODUCTION.
+    environment: ${TRANSBANK_ENVIRONMENT:INTEGRATION}
+    commerce-code: ${TRANSBANK_COMMERCE_CODE:597055555541}
+    api-key: ${TRANSBANK_API_KEY:579B532A7440BB0C9079DED94D31EA1615BACEB56610332264630D42D0A36B1C}
+    # Código de comercio "hijo" contra el que se cargan los cobros
+    # (Oneclick siempre opera en modalidad Mall, aunque haya un solo comercio).
+    child-commerce-code: ${TRANSBANK_CHILD_COMMERCE_CODE:597055555542}
+    # A esta URL del FRONTEND vuelve el usuario tras inscribir su tarjeta
+    # en Transbank; esa página debe leer el token_ws recibido por POST y
+    # llamar a POST /api/companies/{companyId}/payment-methods/finish.
+    response-url: ${TRANSBANK_RESPONSE_URL:http://localhost:5173/payment-methods/callback}

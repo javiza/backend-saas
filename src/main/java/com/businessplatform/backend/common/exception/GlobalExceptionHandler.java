@@ -6,6 +6,10 @@ import com.businessplatform.backend.companyapplication.service.CompanyApplicatio
 import com.businessplatform.backend.companyapplication.service.CompanyApplicationNotFoundException;
 import com.businessplatform.backend.companysubscription.service.CompanySubscriptionConflictException;
 import com.businessplatform.backend.companysubscription.service.CompanySubscriptionNotFoundException;
+import com.businessplatform.backend.payment.service.NoPaymentMethodException;
+import com.businessplatform.backend.payment.service.PaymentDeclinedException;
+import com.businessplatform.backend.paymentmethod.service.PaymentMethodInscriptionFailedException;
+import com.businessplatform.backend.paymentmethod.service.PaymentMethodNotFoundException;
 import com.businessplatform.backend.plan.service.PlanAlreadyExistsException;
 import com.businessplatform.backend.plan.service.PlanNotFoundException;
 import org.springframework.http.HttpStatus;
@@ -105,6 +109,30 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.CONFLICT)
     public ApiError handleCompanySubscriptionConflict(CompanySubscriptionConflictException exception) {
         return new ApiError(409, exception.getMessage(), LocalDateTime.now());
+    }
+
+    @ExceptionHandler(NoPaymentMethodException.class)
+    @ResponseStatus(HttpStatus.PAYMENT_REQUIRED)
+    public ApiError handleNoPaymentMethod(NoPaymentMethodException exception) {
+        return new ApiError(402, exception.getMessage(), LocalDateTime.now());
+    }
+
+    @ExceptionHandler(PaymentDeclinedException.class)
+    @ResponseStatus(HttpStatus.PAYMENT_REQUIRED)
+    public ApiError handlePaymentDeclined(PaymentDeclinedException exception) {
+        return new ApiError(402, exception.getMessage(), LocalDateTime.now());
+    }
+
+    @ExceptionHandler(PaymentMethodNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ApiError handlePaymentMethodNotFound(PaymentMethodNotFoundException exception) {
+        return new ApiError(404, exception.getMessage(), LocalDateTime.now());
+    }
+
+    @ExceptionHandler(PaymentMethodInscriptionFailedException.class)
+    @ResponseStatus(HttpStatus.BAD_GATEWAY)
+    public ApiError handlePaymentMethodInscriptionFailed(PaymentMethodInscriptionFailedException exception) {
+        return new ApiError(502, exception.getMessage(), LocalDateTime.now());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
