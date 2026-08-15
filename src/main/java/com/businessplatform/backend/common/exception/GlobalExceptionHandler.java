@@ -4,6 +4,10 @@ import com.businessplatform.backend.company.service.CompanyAlreadyExistsExceptio
 import com.businessplatform.backend.company.service.CompanyNotFoundException;
 import com.businessplatform.backend.companyapplication.service.CompanyApplicationAlreadyAssignedException;
 import com.businessplatform.backend.companyapplication.service.CompanyApplicationNotFoundException;
+import com.businessplatform.backend.companysubscription.service.CompanySubscriptionConflictException;
+import com.businessplatform.backend.companysubscription.service.CompanySubscriptionNotFoundException;
+import com.businessplatform.backend.plan.service.PlanAlreadyExistsException;
+import com.businessplatform.backend.plan.service.PlanNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -77,6 +81,30 @@ public class GlobalExceptionHandler {
             CompanyApplicationNotFoundException exception
     ) {
         return new ApiError(404, exception.getMessage(), LocalDateTime.now());
+    }
+
+    @ExceptionHandler(PlanNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ApiError handlePlanNotFound(PlanNotFoundException exception) {
+        return new ApiError(404, exception.getMessage(), LocalDateTime.now());
+    }
+
+    @ExceptionHandler(PlanAlreadyExistsException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ApiError handlePlanAlreadyExists(PlanAlreadyExistsException exception) {
+        return new ApiError(409, exception.getMessage(), LocalDateTime.now());
+    }
+
+    @ExceptionHandler(CompanySubscriptionNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ApiError handleCompanySubscriptionNotFound(CompanySubscriptionNotFoundException exception) {
+        return new ApiError(404, exception.getMessage(), LocalDateTime.now());
+    }
+
+    @ExceptionHandler(CompanySubscriptionConflictException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ApiError handleCompanySubscriptionConflict(CompanySubscriptionConflictException exception) {
+        return new ApiError(409, exception.getMessage(), LocalDateTime.now());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
