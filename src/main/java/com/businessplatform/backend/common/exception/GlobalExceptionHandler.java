@@ -1,5 +1,7 @@
 package com.businessplatform.backend.common.exception;
 
+import com.businessplatform.backend.application.service.ApplicationAlreadyExistsException;
+import com.businessplatform.backend.application.service.ApplicationNotFoundException;
 import com.businessplatform.backend.company.service.CompanyAlreadyExistsException;
 import com.businessplatform.backend.company.service.CompanyNotFoundException;
 import com.businessplatform.backend.companyapplication.service.CompanyApplicationAlreadyAssignedException;
@@ -45,6 +47,22 @@ public class GlobalExceptionHandler {
             AccessDeniedException exception
     ) {
         return new ApiError(403, exception.getMessage(), LocalDateTime.now());
+    }
+
+    @ExceptionHandler(ApplicationAlreadyExistsException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ApiError handleApplicationAlreadyExists(
+            ApplicationAlreadyExistsException exception
+    ) {
+        return new ApiError(409, exception.getMessage(), LocalDateTime.now());
+    }
+
+    @ExceptionHandler(ApplicationNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ApiError handleApplicationNotFound(
+            ApplicationNotFoundException exception
+    ) {
+        return new ApiError(404, exception.getMessage(), LocalDateTime.now());
     }
 
     @ExceptionHandler(CompanyAlreadyExistsException.class)

@@ -33,10 +33,23 @@ app:
   jwt:
     secret: ${JWT_SECRET:business-platform-secret-key-change-this-in-production-2026}
     expiration-minutes: ${JWT_EXPIRATION_MINUTES:60}
+  # BootstrapAdminInitializer usa esto para crear, una sola vez, el primer
+  # usuario ADMIN de plataforma (solo si todavía no existe ningún ADMIN).
+  # Antes no había forma de crear el primer ADMIN: /api/auth/register
+  # siempre crea un MANAGER, y POST /api/users ahora requiere ya ser ADMIN.
+  # CAMBIAR la contraseña por defecto antes de ir a producción.
+  bootstrap-admin:
+    email: ${BOOTSTRAP_ADMIN_EMAIL:admin@plataforma.local}
+    password: ${BOOTSTRAP_ADMIN_PASSWORD:ChangeMe123!}
   cors:
     # Orígenes permitidos separados por coma. En producción poner los
     # dominios reales del frontend (ej: https://app.tudominio.com)
     allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173,http://localhost:3000}
+  # Base del frontend (SPA). Se usa para redirigir de vuelta al portal
+  # cliente tras flujos que necesitan que el navegador salga de nuestro
+  # dominio, como la inscripción de tarjeta en Transbank (ver
+  # WebpayReturnController).
+  frontend-url: ${FRONTEND_URL:http://localhost:5173}
 
 # Tarjeta guardada + cobro recurrente vía Oneclick (Transbank). Las
 # credenciales por defecto son las públicas de INTEGRACIÓN (ambiente de
@@ -51,7 +64,10 @@ transbank:
     # Código de comercio "hijo" contra el que se cargan los cobros
     # (Oneclick siempre opera en modalidad Mall, aunque haya un solo comercio).
     child-commerce-code: ${TRANSBANK_CHILD_COMMERCE_CODE:597055555542}
-    # A esta URL del FRONTEND vuelve el usuario tras inscribir su tarjeta
-    # en Transbank; esa página debe leer el token_ws recibido por POST y
-    # llamar a POST /api/companies/{companyId}/payment-methods/finish.
-    response-url: ${TRANSBANK_RESPONSE_URL:http://localhost:5173/payment-methods/callback}
+    # Transbank vuelve a esta URL con un POST (form-urlencoded, no fetch)
+    # que trae token_ws en el body. Un navegador no puede leer el body de
+    # una navegación POST, así que esto NO puede apuntar directo al SPA:
+    # apunta a WebpayReturnController (backend), que recibe el POST y
+    # redirige (302, GET) al frontend con el token como query param, algo
+    # que el SPA sí puede leer (ver PaymentCallback.jsx).
+    response-url: ${TRANSBANK_RESPONSE_URL:http://localhost:8080/api/payment-methods/webpay-return}

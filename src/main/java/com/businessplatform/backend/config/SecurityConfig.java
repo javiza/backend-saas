@@ -53,7 +53,10 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/api/health",
                                 "/api/auth/login",
-                                "/api/auth/register"
+                                "/api/auth/register",
+                                // Transbank llama esto directo (POST, sin JWT) al volver
+                                // de la inscripción de tarjeta — ver WebpayReturnController.
+                                "/api/payment-methods/webpay-return"
                         ).permitAll()
 
                         .anyRequest().authenticated()

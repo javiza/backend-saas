@@ -27,7 +27,9 @@ public class ApplicationService {
     public ApplicationResponse findByCode(String code) {
         Application application = repository.findByCode(code)
                 .orElseThrow(() ->
-                        new RuntimeException("Application not found")
+                        new ApplicationNotFoundException(
+                                "Aplicación no encontrada: " + code
+                        )
                 );
 
         return new ApplicationResponse(application);
@@ -36,8 +38,8 @@ public class ApplicationService {
     public ApplicationResponse create(CreateApplicationRequest request) {
 
         if (repository.existsByCode(request.getCode())) {
-            throw new RuntimeException(
-                    "Application code already exists"
+            throw new ApplicationAlreadyExistsException(
+                    "Ya existe una aplicación con el código \"" + request.getCode() + "\""
             );
         }
 
